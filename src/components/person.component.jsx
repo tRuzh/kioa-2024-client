@@ -46,6 +46,12 @@ class Person extends Component {
       });
   }
 
+  componentDidUpdate(prevProps) {
+    if (this.props.match.params.id !== prevProps.match.params.id) {
+      this.getPerson(this.props.match.params.id);
+    }
+  }
+
   onChangeFirstname(e) {
     const firstname = e.target.value;
     this.setState((prevState) => ({
@@ -81,12 +87,15 @@ class Person extends Component {
       .then((response) => {
         this.setState({
           currentPerson: response.data,
+          loading: false,
         });
         console.log(response.data);
       })
       .catch((e) => {
-        console.log(e);
-        throw e;
+        this.setState({
+          error: e.message,
+          loading: false,
+        });
       });
   }
 

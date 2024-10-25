@@ -13,6 +13,7 @@ class PeopleList extends Component {
     this.setActivePerson = this.setActivePerson.bind(this);
     this.findByFirstname = this.findByFirstname.bind(this);
     this.showFamilyTree = this.showFamilyTree.bind(this);
+    this.resetState = this.resetState.bind(this);
     this.state = {
       currentPerson: null,
       currentIndex: -1,
@@ -32,6 +33,12 @@ class PeopleList extends Component {
       .catch((e) => {
         this.setState({ loading: false, error: e.message });
       });
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.location !== prevProps.location) {
+      this.resetState();
+    }
   }
 
   onChangeSearchFirstname(e) {
@@ -89,13 +96,29 @@ class PeopleList extends Component {
   }
 
   findByFirstname() {
+    this.setState({ loading: true });
     this.refreshData();
     this.props.findPeopleByFirstname(this.state.searchFirstname)
+      .then(() => {
+        this.setState({ loading: false });
+      })
       .catch((e) => {
-        this.setState({ error: e.message });
+        this.setState({ error: e.message, loading: false });
         console.log(e);
       });
   }
+
+  resetState() {
+    this.setState({
+      currentPerson: null,
+      currentIndex: -1,
+      searchFirstname: "",
+      familyTree: {},
+      loading: false,
+      error: null,
+    });
+    this.props.retrievePeople();
+  } 
 
   render() {
     const { searchFirstname, currentPerson, familyTree, currentIndex, loading, error } = this.state;
