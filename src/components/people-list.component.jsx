@@ -149,7 +149,6 @@ class PeopleList extends Component {
           </div>
         </div>
         <div className="col-md-6">
-          {console.log(people)}
           {loading ? (
             <div>Loading...</div>
           ) : searchPerformed ? (  
