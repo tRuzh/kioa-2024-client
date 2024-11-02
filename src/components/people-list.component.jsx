@@ -149,9 +149,10 @@ class PeopleList extends Component {
           </div>
         </div>
         <div className="col-md-6">
+          <h4>People List</h4>
           {loading ? (
             <div>Loading...</div>
-          ) : searchPerformed ? (  
+          ) : searchPerformed ? (
             <ul className="list-group">
               {people &&
                 people.map((person, index) => (
@@ -167,7 +168,9 @@ class PeopleList extends Component {
                   </li>
                 ))}
             </ul>
-          ) : ""}
+          ) : (
+            <div>Please perform a search to see the list of people.</div>
+          )}
         </div>
         <div className="col-md-6">
           {currentPerson ? (
@@ -221,9 +224,9 @@ class PeopleList extends Component {
               {this.renderFamilyTree(familyTree[currentPerson.id])}
             </div>
           ) : (
-            <div> 
+            <div>
               <br />
-                <p>Please click on a Person...</p>
+              <p>Please click on a Person...</p>
             </div>
           )}
         </div>
