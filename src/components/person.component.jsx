@@ -46,6 +46,7 @@ class Person extends Component {
       });
   }
 
+  // Update the person when the id in the URL changes
   componentDidUpdate(prevProps) {
     if (this.props.match.params.id !== prevProps.match.params.id) {
       this.getPerson(this.props.match.params.id);
@@ -137,6 +138,38 @@ class Person extends Component {
         console.log(e);
         this.setState({ error: e.message });
       });
+  }
+
+  updateImmediateRelatives(updatedPerson) {
+    const { immediatefamilies } = updatedPerson;
+
+    immediatefamilies.forEach((relative) => {
+      PersonDataService.get(relative._id)
+        .then((response) => {
+          const relativePerson = response.data;
+          const updatedImmediateFamilies = relativePerson.immediatefamilies.map((immediatefamily) => {
+            if (immediatefamily._id === updatedPerson.id) {
+              return {
+                ...immediatefamily,
+                fullname: `${updatedPerson.firstname} ${updatedPerson.lastname}`,
+                gender: updatedPerson.gender,
+              };
+            }
+            return immediatefamily;
+          });
+
+          PersonDataService.updateImmediateFamilies(relativePerson.id, updatedImmediateFamilies)
+            .then((response) => {
+              console.log("Immediate relatives updated:", response.data);
+            })
+            .catch((e) => {
+              console.log(e);
+            });
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    });
   }
 
   removePerson() {

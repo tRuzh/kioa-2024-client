@@ -21,6 +21,7 @@ class PeopleList extends Component {
       familyTree: {},
       loading: false,
       error: null,
+      searchPerformed: false,
     };
   }
 
@@ -100,7 +101,7 @@ class PeopleList extends Component {
     this.refreshData();
     this.props.findPeopleByFirstname(this.state.searchFirstname)
       .then(() => {
-        this.setState({ loading: false });
+        this.setState({ loading: false, searchPerformed: true });
       })
       .catch((e) => {
         this.setState({ error: e.message, loading: false });
@@ -116,12 +117,13 @@ class PeopleList extends Component {
       familyTree: {},
       loading: false,
       error: null,
+      searchPerformed: false,
     });
     this.props.retrievePeople();
   } 
 
   render() {
-    const { searchFirstname, currentPerson, familyTree, currentIndex, loading, error } = this.state;
+    const { searchFirstname, currentPerson, familyTree, currentIndex, loading, error, searchPerformed } = this.state;
     const { people } = this.props;
 
     return (
@@ -147,10 +149,10 @@ class PeopleList extends Component {
           </div>
         </div>
         <div className="col-md-6">
-          <h4>People List</h4>
+          {console.log(people)}
           {loading ? (
             <div>Loading...</div>
-          ) : (
+          ) : searchPerformed ? (  
             <ul className="list-group">
               {people &&
                 people.map((person, index) => (
@@ -166,7 +168,7 @@ class PeopleList extends Component {
                   </li>
                 ))}
             </ul>
-          )}
+          ) : ""}
         </div>
         <div className="col-md-6">
           {currentPerson ? (
@@ -220,9 +222,9 @@ class PeopleList extends Component {
               {this.renderFamilyTree(familyTree[currentPerson.id])}
             </div>
           ) : (
-            <div>
+            <div> 
               <br />
-              <p>Please click on a Person...</p>
+                <p>Please click on a Person...</p>
             </div>
           )}
         </div>
