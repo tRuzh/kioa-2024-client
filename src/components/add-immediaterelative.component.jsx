@@ -1,18 +1,18 @@
-// add-immediatefamily.component.jsx
+// add-immediaterelative.component.jsx
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { findPeopleByFirstname } from "../actions/people";
 
-class AddImmediateFamily extends Component {
+class AddImmediateRelative extends Component {
   constructor(props) {
     super(props);
     this.onChangeSearchFirstname = this.onChangeSearchFirstname.bind(this);
-    this.searchImmediateFamilies = this.searchImmediateFamilies.bind(this);
-    this.selectImmediateFamily = this.selectImmediateFamily.bind(this);
+    this.searchImmediateRelatives = this.searchImmediateRelatives.bind(this);
+    this.selectImmediateRelative = this.selectImmediateRelative.bind(this);
 
     this.state = {
       searchFirstname: "",
-      selectedImmediateFamily: null,
+      selectedImmediateRelative: null,
       relationship: "",
       searchPerformed: false,
     };
@@ -23,17 +23,17 @@ class AddImmediateFamily extends Component {
     this.setState({ searchFirstname });
   }
 
-  searchImmediateFamilies() {
+  searchImmediateRelatives() {
     this.props.findPeopleByFirstname(this.state.searchFirstname);
     this.setState({ searchPerformed: true });
   }
 
-  selectImmediateFamily(immediatefamily) {
-    this.setState({ selectedImmediateFamily: immediatefamily });
+  selectImmediateRelative(immediaterelative) {
+    this.setState({ selectedImmediateRelative: immediaterelative });
   }
 
   render() {
-    const { searchFirstname, selectedImmediateFamily, relationship, searchPerformed } = this.state;
+    const { searchFirstname, selectedImmediateRelative, relationship, searchPerformed } = this.state;
     const { people } = this.props;
 
     return (
@@ -50,7 +50,7 @@ class AddImmediateFamily extends Component {
             <button
               className="btn btn-outline-secondary"
               type="button"
-              onClick={this.searchImmediateFamilies}
+              onClick={this.searchImmediateRelatives}
             >
               Search
             </button>
@@ -62,7 +62,7 @@ class AddImmediateFamily extends Component {
               people.map((person) => (
                 <li
                   className="list-group-item"
-                  onClick={() => this.selectImmediateFamily(person)}
+                  onClick={() => this.selectImmediateRelative(person)}
                   key={person._id}
                 >
                   {person.firstname} {person.lastname} ({person.gender})
@@ -70,10 +70,10 @@ class AddImmediateFamily extends Component {
               ))}
           </ul>
         )}
-        {selectedImmediateFamily && (
+        {selectedImmediateRelative && (
           <div>
-            <h4>Selected ImmediateFamily</h4>
-            <p>{selectedImmediateFamily.firstname} {selectedImmediateFamily.lastname} ({selectedImmediateFamily.gender})</p>
+            <h4>Selected ImmediateRelative</h4>
+            <p>{selectedImmediateRelative.firstname} {selectedImmediateRelative.lastname} ({selectedImmediateRelative.gender})</p>
             <div className="form-group">
               <label htmlFor="relationship">Relationship</label>
               <select
@@ -95,9 +95,9 @@ class AddImmediateFamily extends Component {
             </div>
             <button
               className="btn btn-success"
-              onClick={() => this.props.onAddImmediateFamily(selectedImmediateFamily, relationship)}
+              onClick={() => this.props.onAddImmediateRelative(selectedImmediateRelative, relationship)}
             >
-              Add ImmediateFamily
+              Add ImmediateRelative
             </button>
           </div>
         )}
@@ -112,4 +112,4 @@ const mapStateToProps = (state) => {
   };
 };
 
-export default connect(mapStateToProps, { findPeopleByFirstname })(AddImmediateFamily);
+export default connect(mapStateToProps, { findPeopleByFirstname })(AddImmediateRelative);

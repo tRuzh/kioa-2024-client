@@ -1,9 +1,9 @@
-// person.component.jsx
+// client-git/src/components/person.component.jsx
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { updatePerson, deletePerson } from "../actions/people";
 import PersonDataService from "../services/person.service";
-import AddImmediateFamily from "./add-immediatefamily.component";
+import AddImmediateRelative from "./add-immediaterelative.component";
 import { Link } from "react-router-dom";
 
 class Person extends Component {
@@ -16,9 +16,9 @@ class Person extends Component {
     this.updateStatus = this.updateStatus.bind(this);
     this.updateContent = this.updateContent.bind(this);
     this.removePerson = this.removePerson.bind(this);
-    this.toggleAddImmediateFamily = this.toggleAddImmediateFamily.bind(this);
-    this.onAddImmediateFamily = this.onAddImmediateFamily.bind(this);
-    this.onDeleteImmediateFamily = this.onDeleteImmediateFamily.bind(this);
+    this.toggleAddImmediateRelative = this.toggleAddImmediateRelative.bind(this);
+    this.onAddImmediateRelative = this.onAddImmediateRelative.bind(this);
+    this.onDeleteImmediateRelative = this.onDeleteImmediateRelative.bind(this);
     this.state = {
       currentPerson: {
         id: null,
@@ -26,12 +26,12 @@ class Person extends Component {
         lastname: "",
         gender: "male",
         deceased: false,
-        immediatefamilies: [],
+        immediaterelatives: [],
       },
       message: "",
-      loading: false,
+      loading: true,
       error: null,
-      showAddImmediateFamily: false,
+      showAddImmediateRelative: false,
     };
   }
 
@@ -49,6 +49,7 @@ class Person extends Component {
   // Update the person when the id in the URL changes
   componentDidUpdate(prevProps) {
     if (this.props.match.params.id !== prevProps.match.params.id) {
+      this.setState({ currentPerson: null, loading: true, error: null, message: "", showAddImmediateRelative: false });
       this.getPerson(this.props.match.params.id);
     }
   }
@@ -90,7 +91,7 @@ class Person extends Component {
           currentPerson: response.data,
           loading: false,
         });
-        console.log(response.data);
+        //console.log(response.data);
       })
       .catch((e) => {
         this.setState({
@@ -107,12 +108,12 @@ class Person extends Component {
       lastname: this.state.currentPerson.lastname,
       gender: this.state.currentPerson.gender,
       deceased: status,
-      immediatefamilies: this.state.currentPerson.immediatefamilies,
+      immediaterelatives: this.state.currentPerson.immediaterelatives,
     };
     this.props
       .updatePerson(this.state.currentPerson.id, data)
       .then((response) => {
-        console.log(response);
+        //console.log(response);
         this.setState((prevState) => ({
           currentPerson: {
             ...prevState.currentPerson,
@@ -122,17 +123,18 @@ class Person extends Component {
         this.setState({ message: "The status was updated successfully!" });
       })
       .catch((e) => {
-        console.log(e);
+        //console.log(e);
         this.setState({ error: e.message });
       });
   }
 
   updateContent() {
+    const { currentPerson } = this.state;
     this.props
-      .updatePerson(this.state.currentPerson.id, this.state.currentPerson)
+      .updatePerson(currentPerson.id, currentPerson)
       .then((response) => {
-        console.log(response);
         this.setState({ message: "The person was updated successfully!" });
+        //this.updateImmediateRelatives(currentPerson);
       })
       .catch((e) => {
         console.log(e);
@@ -140,27 +142,27 @@ class Person extends Component {
       });
   }
 
-  updateImmediateRelatives(updatedPerson) {
-    const { immediatefamilies } = updatedPerson;
+  /*updateImmediateRelatives(updatedPerson) {
+    const { immediaterelatives } = updatedPerson;
 
-    immediatefamilies.forEach((relative) => {
+    immediaterelatives.forEach((relative) => {
       PersonDataService.get(relative._id)
         .then((response) => {
           const relativePerson = response.data;
-          const updatedImmediateFamilies = relativePerson.immediatefamilies.map((immediatefamily) => {
-            if (immediatefamily._id === updatedPerson.id) {
+          const updatedImmediateRelatives = relativePerson.immediaterelatives.map((immediaterelative) => {
+            if (immediaterelative._id === updatedPerson.id) {
               return {
-                ...immediatefamily,
+                ...immediaterelative,
                 fullname: `${updatedPerson.firstname} ${updatedPerson.lastname}`,
                 gender: updatedPerson.gender,
               };
             }
-            return immediatefamily;
+            return immediaterelative;
           });
 
-          PersonDataService.updateImmediateFamilies(relativePerson.id, updatedImmediateFamilies)
+          PersonDataService.updateImmediateRelatives(relativePerson.id, updatedImmediateRelatives)
             .then((response) => {
-              console.log("Immediate relatives updated:", response.data);
+              //console.log("Immediate relatives updated:", response.data);
             })
             .catch((e) => {
               console.log(e);
@@ -170,7 +172,7 @@ class Person extends Component {
           console.log(e);
         });
     });
-  }
+  }*/
 
   removePerson() {
     this.props
@@ -184,32 +186,32 @@ class Person extends Component {
       });
   }
 
-  toggleAddImmediateFamily() {
-    this.setState({ showAddImmediateFamily: !this.state.showAddImmediateFamily });
+  toggleAddImmediateRelative() {
+    this.setState({ showAddImmediateRelative: !this.state.showAddImmediateRelative });
   }
 
-  onAddImmediateFamily(immediatefamily, relationship) {
+  onAddImmediateRelative(immediaterelative, relationship) {
     if (!relationship) {
       this.setState({ error: "Relationship is required!" });
       return;
     }
-    const updatedImmediateFamilies = [...this.state.currentPerson.immediatefamilies, { _id: immediatefamily.id, relationship, fullname: `${immediatefamily.firstname} ${immediatefamily.lastname}` }];
+    const updatedImmediateRelatives = [...this.state.currentPerson.immediaterelatives, { _id: immediaterelative.id, relationship, fullname: `${immediaterelative.firstname} ${immediaterelative.lastname}` }];
     this.setState(
       (prevState) => ({
         currentPerson: {
           ...prevState.currentPerson,
-          immediatefamilies: updatedImmediateFamilies,
+          immediaterelatives: updatedImmediateRelatives,
         },
-        showAddImmediateFamily: false, // Hide AddImmediateFamily after adding
+        showAddImmediateRelative: false, // Hide AddImmediateRelative after adding
       }),
       () => {
         this.updateContent();
-        this.addReciprocalRelationship(immediatefamily, relationship);
+        this.addReciprocalRelationship(immediaterelative, relationship);
       }
     );
   }
 
-  addReciprocalRelationship(immediatefamily, relationship) {
+  addReciprocalRelationship(immediaterelative, relationship) {
     let reciprocalRelationship = "";
 
     switch (relationship) {
@@ -241,14 +243,14 @@ class Person extends Component {
         return;
     }
 
-    const reciprocalImmediateFamily = {
+    const reciprocalImmediateRelative = {
       _id: this.state.currentPerson.id,
       relationship: reciprocalRelationship,
       fullname: `${this.state.currentPerson.firstname} ${this.state.currentPerson.lastname}`
     };
 
-    // Call method to update the immediate families of a person
-    PersonDataService.updateImmediateFamilies(immediatefamily.id, reciprocalImmediateFamily)
+    // Call method to update the immediate relatives of a person
+    PersonDataService.updateImmediateRelatives(immediaterelative.id, reciprocalImmediateRelative)
       .then(response => {
         console.log("Reciprocal relationship added:", response.data);
       })
@@ -257,34 +259,45 @@ class Person extends Component {
       });
   }
 
-  onDeleteImmediateFamily(immediatefamilyId) {
-    const updatedImmediateFamilies = this.state.currentPerson.immediatefamilies.filter(immediatefamily => immediatefamily._id !== immediatefamilyId);
-    const deletedFamily = this.state.currentPerson.immediatefamilies.find(immediatefamily => immediatefamily._id === immediatefamilyId);
+  /**
+   * Deletes an immediate relative from the current person's list of immediate relatives.
+   * 
+   * @param {string} immediaterelativeId - The ID of the immediate relative to be deleted.
+   * @returns {void}
+   */
+  onDeleteImmediateRelative(immediaterelativeId) {
+    const updatedImmediateRelatives = this.state.currentPerson.immediaterelatives.filter(immediaterelative => immediaterelative._id !== immediaterelativeId);
+    const deletedRelative = this.state.currentPerson.immediaterelatives.find(immediaterelative => immediaterelative._id === immediaterelativeId);
 
     this.setState(
       (prevState) => ({
         currentPerson: {
           ...prevState.currentPerson,
-          immediatefamilies: updatedImmediateFamilies,
+          immediaterelatives: updatedImmediateRelatives,
         }
       }),
       () => {
         this.updateContent();
-        this.deleteReciprocalRelationship(deletedFamily);
+        this.deleteReciprocalRelationship(deletedRelative);
       }
     );
   }
 
-  deleteReciprocalRelationship(deletedFamily) {
-    if (!deletedFamily) return;
+  /**
+   * Deletes the reciprocal relationship of the deleted relative.
+   *
+   * @param {Object} deletedRelative - The deleted relative object.
+   */
+  deleteReciprocalRelationship(deletedRelative) {
+    if (!deletedRelative) return;
 
-    const reciprocalImmediateFamily = {
+    const reciprocalImmediateRelative = {
       _id: this.state.currentPerson.id,
-      fullname: `${this.state.currentPerson.firstname} ${this.state.currentPerson.lastname}`
+      //fullname: `${this.state.currentPerson.firstname} ${this.state.currentPerson.lastname}`  not needed
     };
 
-    // Call method to delete the immediate family from the other person
-    PersonDataService.deleteImmediateFamily(deletedFamily._id, reciprocalImmediateFamily)
+    // Call method to delete the immediate relative from the other person
+    PersonDataService.deleteImmediateRelative(deletedRelative._id, reciprocalImmediateRelative)
       .then(response => {
         console.log("Reciprocal relationship deleted:", response.data);
       })
@@ -294,7 +307,7 @@ class Person extends Component {
   }
 
   render() {
-    const { currentPerson, loading, error, message, showAddImmediateFamily } = this.state;
+    const { currentPerson, loading, error, message, showAddImmediateRelative } = this.state;
 
     return (
       <div>
@@ -346,15 +359,15 @@ class Person extends Component {
             </form>
             <div className="form-group">
               <label>
-                <strong>Immediate families:</strong>
+                <strong>Immediate relatives:</strong>
               </label>
               <ul>
-                {currentPerson.immediatefamilies.map((immediatefamily) => (
-                  <li key={immediatefamily._id}>
-                    <Link to={"/people/" + immediatefamily._id}> {immediatefamily.fullname} ({immediatefamily.relationship})</Link>
+                {currentPerson.immediaterelatives.map((immediaterelative) => (
+                  <li key={immediaterelative._id}>
+                    <Link to={"/people/" + immediaterelative._id}> {immediaterelative.fullname} ({immediaterelative.relationship})</Link>
                     <button
                       className="badge badge-danger mr-2"
-                      onClick={() => this.onDeleteImmediateFamily(immediatefamily._id)}
+                      onClick={() => this.onDeleteImmediateRelative(immediaterelative._id)}
                     >
                       Delete
                     </button>
@@ -362,10 +375,10 @@ class Person extends Component {
                 ))}
               </ul>
             </div>
-            <button className="btn btn-primary" onClick={this.toggleAddImmediateFamily}>
-              {showAddImmediateFamily ? "Cancel" : "Add ImmediateFamily"}
+            <button className="btn btn-primary" onClick={this.toggleAddImmediateRelative}>
+              {showAddImmediateRelative ? "Cancel" : "Add ImmediateRelative"}
             </button>
-            {showAddImmediateFamily && <AddImmediateFamily personId={currentPerson._id} onAddImmediateFamily={this.onAddImmediateFamily} />}
+            {showAddImmediateRelative && <AddImmediateRelative personId={currentPerson._id} onAddImmediateRelative={this.onAddImmediateRelative} />}
             {currentPerson.deceased ? (
               <button
                 className="badge badge-primary mr-2"

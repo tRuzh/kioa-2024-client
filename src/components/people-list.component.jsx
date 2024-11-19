@@ -1,4 +1,4 @@
-// people-list.component.jsx
+// client-git/src/components/people-list.component.jsx
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { retrievePeople, findPeopleByFirstname } from "../actions/people";
@@ -66,7 +66,7 @@ class PeopleList extends Component {
     console.log(`Fetching family tree for personId: ${personId}`);
     PersonDataService.getFamilyTree(personId)
       .then(response => {
-        console.log("Family tree data:", response.data);
+        console.log("Family Tree data:", response.data);
         this.setState({
           familyTree: {
             [personId]: response.data,
@@ -87,8 +87,8 @@ class PeopleList extends Component {
         {members.map((member) => (
           <li key={member.id}>
             <Link to={`/people/${member.id}`}>{member.fullname}</Link>
-            {member.immediatefamilies && member.immediatefamilies.length > 0 && (
-              this.renderFamilyTree(member.immediatefamilies)
+            {member.immediaterelatives && member.immediaterelatives.length > 0 && (
+              this.renderFamilyTree(member.immediaterelatives)
             )}
           </li>
         ))}
@@ -121,6 +121,18 @@ class PeopleList extends Component {
     });
     this.props.retrievePeople();
   } 
+
+  handleImmediateRelativeClick(immediateRelativeId) {
+    PersonDataService.get(immediateRelativeId)
+      .then((response) => {
+        const person = response.data;
+        const index = this.props.people.findIndex(p => p.id === person.id);
+        this.setActivePerson(person, index);
+      })
+      .catch((e) => {
+        this.setState({ error: e.message });
+      });
+  }
 
   render() {
     const { searchFirstname, currentPerson, familyTree, currentIndex, loading, error, searchPerformed } = this.state;
@@ -202,12 +214,17 @@ class PeopleList extends Component {
               </div>
               <div>
                 <label>
-                  <strong>Immediate families:</strong>
+                  <strong>Immediate relatives:</strong>
                 </label>
                 <ul>
-                  {currentPerson.immediatefamilies.map((immediatefamily) => (
-                    <li key={immediatefamily._id}>
-                      <Link to={"/people/" + immediatefamily._id}>{immediatefamily.fullname} ({immediatefamily.relationship})</Link>
+                  {currentPerson.immediaterelatives.map((immediaterelative) => (
+                    <li key={immediaterelative._id}>
+                      <button
+                        className="btn btn-link"
+                        onClick={() => this.handleImmediateRelativeClick(immediaterelative._id)}
+                      >
+                        {immediaterelative.fullname} ({immediaterelative.relationship})
+                      </button>
                     </li>
                   ))}
                 </ul>

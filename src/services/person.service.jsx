@@ -21,12 +21,12 @@ class PersonDataService {
     return http.put(`/people/${id}`, data);
   }
 
-  updateImmediateFamilies(id, immediateFamily) {
-    return http.put(`/people/${id}/immediatefamilies`, immediateFamily);
+  updateImmediateRelatives(id, data) {
+    return http.put(`/people/${id}/immediaterelatives`, data);
   }
 
-  deleteImmediateFamily(id, immediateFamily) {
-    return http.put(`/people/${id}/immediatefamilies/delete`, immediateFamily);
+  deleteImmediateRelative(id, immediateRelative) {
+    return http.put(`/people/${id}/immediaterelatives/delete`, immediateRelative);
   }
 
   delete(id) {

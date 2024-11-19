@@ -1,6 +1,6 @@
-export const SET_FAMILY_TREE = "SET_FAMILY_TREE";
+export const SET_RELATIVE_TREE = "SET_RELATIVE_TREE";
 
 export const setFamilyTree = (familyTree) => ({
-  type: SET_FAMILY_TREE,
+  type: SET_RELATIVE_TREE,
   payload: familyTree,
 });

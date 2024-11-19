@@ -1,10 +1,10 @@
-import { SET_FAMILY_TREE } from "../actions/familyTree";
+import { SET_RELATIVE_TREE } from "../actions/familyTree";
 
 const initialState = {};
 
 const familyTreeReducer = (state = initialState, action) => {
   switch (action.type) {
-    case SET_FAMILY_TREE:
+    case SET_RELATIVE_TREE:
       return action.payload;
     default:
       return state;

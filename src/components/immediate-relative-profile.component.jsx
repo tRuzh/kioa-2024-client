@@ -1,8 +1,8 @@
-// client-git/src/components/immediate-family-profile.component.jsx
+// client-git/src/components/immediate-relative-profile.component.jsx
 import React, { Component } from "react";
 import PersonDataService from "../services/person.service";
 
-class ImmediateFamilyProfile extends Component {
+class ImmediateRelativeProfile extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -51,4 +51,4 @@ class ImmediateFamilyProfile extends Component {
   }
 }
 
-export default ImmediateFamilyProfile;
+export default ImmediateRelativeProfile;
