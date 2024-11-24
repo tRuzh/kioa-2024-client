@@ -63,10 +63,10 @@ class PeopleList extends Component {
   }
 
   showFamilyTree(personId) {
-    console.log(`Fetching family tree for personId: ${personId}`);
+    //console.log(`Fetching family tree for personId: ${personId}`);
     PersonDataService.getFamilyTree(personId)
       .then(response => {
-        console.log("Family Tree data:", response.data);
+        //console.log("Family Tree data:", response.data);
         this.setState({
           familyTree: {
             [personId]: response.data,
@@ -86,7 +86,9 @@ class PeopleList extends Component {
       <ul>
         {members.map((member) => (
           <li key={member.id}>
-            <Link to={`/people/${member.id}`}>{member.fullname}</Link>
+            <button className="btn btn-link" onClick={() => this.handleImmediateRelativeClick(member.id)}>
+              {member.fullname}
+            </button>
             {member.immediaterelatives && member.immediaterelatives.length > 0 && (
               this.renderFamilyTree(member.immediaterelatives)
             )}
