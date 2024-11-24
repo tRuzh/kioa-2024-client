@@ -6,7 +6,7 @@ const baseURLs = {
 };
 
 export default axios.create({
-  baseURL: baseURLs.local, // Set the default base URL to the local URL
+  baseURL: baseURLs.heroku, // Set the default base URL to the local URL
   headers: {
     "Content-type": "application/json"
   }
