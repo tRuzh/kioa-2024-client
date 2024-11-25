@@ -7,9 +7,10 @@ class AddImmediateRelative extends Component {
   constructor(props) {
     super(props);
     this.onChangeSearchFirstname = this.onChangeSearchFirstname.bind(this);
-    this.searchImmediateRelatives = this.searchImmediateRelatives.bind(this);
+    this.findByFirstname = this.findByFirstname.bind(this);
     this.selectImmediateRelative = this.selectImmediateRelative.bind(this);
-
+    this.handleKeyDown = this.handleKeyDown.bind(this);
+    this.searchButtonRef = React.createRef();
     this.state = {
       searchFirstname: "",
       selectedImmediateRelative: null,
@@ -18,14 +19,37 @@ class AddImmediateRelative extends Component {
     };
   }
 
+  componentDidMount() {
+    document.addEventListener("keydown", this.handleKeyDown);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener("keydown", this.handleKeyDown);
+  }
+
+  handleKeyDown(event) {
+    if (event.key === "Enter") {
+      this.searchButtonRef.current.click();
+    }
+  }
+
   onChangeSearchFirstname(e) {
     const searchFirstname = e.target.value;
     this.setState({ searchFirstname });
   }
 
-  searchImmediateRelatives() {
-    this.props.findPeopleByFirstname(this.state.searchFirstname);
-    this.setState({ searchPerformed: true });
+  findByFirstname() {
+    this.setState({ loading: true });
+    this.props.findPeopleByFirstname(this.state.searchFirstname)
+      .then(() => {
+        this.setState({ loading: false, searchPerformed: true });
+      })
+      .catch((e) => {
+        this.setState({
+          error: e.message,
+          loading: false,
+        });
+      });
   }
 
   selectImmediateRelative(immediaterelative) {
@@ -50,7 +74,8 @@ class AddImmediateRelative extends Component {
             <button
               className="btn btn-outline-secondary"
               type="button"
-              onClick={this.searchImmediateRelatives}
+              onClick={this.findByFirstname}
+              ref={this.searchButtonRef}
             >
               Search
             </button>

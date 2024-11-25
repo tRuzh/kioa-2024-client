@@ -14,6 +14,8 @@ class PeopleList extends Component {
     this.findByFirstname = this.findByFirstname.bind(this);
     this.showFamilyTree = this.showFamilyTree.bind(this);
     this.resetState = this.resetState.bind(this);
+    this.handleKeyDown = this.handleKeyDown.bind(this);
+    this.searchButtonRef = React.createRef();
     this.state = {
       currentPerson: null,
       currentIndex: -1,
@@ -34,6 +36,17 @@ class PeopleList extends Component {
       .catch((e) => {
         this.setState({ loading: false, error: e.message });
       });
+    document.addEventListener("keydown", this.handleKeyDown);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener("keydown", this.handleKeyDown);
+  }
+
+  handleKeyDown(event) {
+    if (event.key === "Enter") {
+      this.searchButtonRef.current.click();
+    }
   }
 
   componentDidUpdate(prevProps) {
@@ -87,7 +100,7 @@ class PeopleList extends Component {
         {members.map((member) => (
           <li key={member.id}>
             <button className="btn btn-link" onClick={() => this.handleImmediateRelativeClick(member.id)}>
-              {member.fullname}
+              {member.fullname} {member.relationship !== "Child" ? "("+member.relationship+")" : ""}
             </button>
             {member.immediaterelatives && member.immediaterelatives.length > 0 && (
               this.renderFamilyTree(member.immediaterelatives)
@@ -156,6 +169,7 @@ class PeopleList extends Component {
                 className="btn btn-outline-secondary"
                 type="button"
                 onClick={this.findByFirstname}
+                ref={this.searchButtonRef}
               >
                 Search
               </button>

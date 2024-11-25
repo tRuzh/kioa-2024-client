@@ -36,6 +36,11 @@ class PersonDataService {
   findByFirstname(firstname) {
     return http.get(`/people?firstname=${firstname}`);
   }
+
+  addImmediateRelative(data) {
+    return http.post(`/people/addImmediateRelative`, data);
+  }
 }
 
-export default new PersonDataService();
+const personDataService = new PersonDataService();
+export default personDataService;

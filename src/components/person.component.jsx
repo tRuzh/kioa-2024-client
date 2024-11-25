@@ -142,40 +142,9 @@ class Person extends Component {
       });
   }
 
-  /*updateImmediateRelatives(updatedPerson) {
-    const { immediaterelatives } = updatedPerson;
-
-    immediaterelatives.forEach((relative) => {
-      PersonDataService.get(relative._id)
-        .then((response) => {
-          const relativePerson = response.data;
-          const updatedImmediateRelatives = relativePerson.immediaterelatives.map((immediaterelative) => {
-            if (immediaterelative._id === updatedPerson.id) {
-              return {
-                ...immediaterelative,
-                fullname: `${updatedPerson.firstname} ${updatedPerson.lastname}`,
-                gender: updatedPerson.gender,
-              };
-            }
-            return immediaterelative;
-          });
-
-          PersonDataService.updateImmediateRelatives(relativePerson.id, updatedImmediateRelatives)
-            .then((response) => {
-              //console.log("Immediate relatives updated:", response.data);
-            })
-            .catch((e) => {
-              console.log(e);
-            });
-        })
-        .catch((e) => {
-          console.log(e);
-        });
-    });
-  }*/
-
   removePerson() {
-    this.props
+    if (window.confirm("Are you sure you want to delete this person?")) {
+      this.props
       .deletePerson(this.state.currentPerson.id)
       .then(() => {
         this.props.history.push("/people");
@@ -184,78 +153,62 @@ class Person extends Component {
         console.log(e);
         this.setState({ error: e.message });
       });
+    }
   }
 
   toggleAddImmediateRelative() {
     this.setState({ showAddImmediateRelative: !this.state.showAddImmediateRelative });
   }
-
+  
+  // Add an immediate relative
   onAddImmediateRelative(immediaterelative, relationship) {
     if (!relationship) {
       this.setState({ error: "Relationship is required!" });
       return;
     }
-    const updatedImmediateRelatives = [...this.state.currentPerson.immediaterelatives, { _id: immediaterelative.id, relationship, fullname: `${immediaterelative.firstname} ${immediaterelative.lastname}` }];
-    this.setState(
-      (prevState) => ({
-        currentPerson: {
-          ...prevState.currentPerson,
-          immediaterelatives: updatedImmediateRelatives,
-        },
-        showAddImmediateRelative: false, // Hide AddImmediateRelative after adding
-      }),
-      () => {
-        this.updateContent();
-        this.addReciprocalRelationship(immediaterelative, relationship);
-      }
-    );
-  }
 
-  addReciprocalRelationship(immediaterelative, relationship) {
-    let reciprocalRelationship = "";
-
-    switch (relationship) {
-      case "Parent":
-        reciprocalRelationship = "Child";
-        break;
-      case "Adopted parent":
-        reciprocalRelationship = "Adopted child";
-        break;
-      case "Stepparent":
-        reciprocalRelationship = "Stepchild";
-        break;
-      case "Spouse":
-        reciprocalRelationship = "Spouse";
-        break;
-      case "Ex-spouse":
-        reciprocalRelationship = "Ex-spouse";
-        break;
-      case "Child":
-        reciprocalRelationship = "Parent";
-        break;
-      case "Adopted child":
-        reciprocalRelationship = "Adopted parent";
-        break;
-      case "Stepchild":
-        reciprocalRelationship = "Stepparent";
-        break;
-      default:
-        return;
+    // Check if person is trying to add itself as a relative
+    if (immediaterelative.id === this.state.currentPerson.id) {
+      this.setState({ error: "Cannot add yourself as a relative." });
+      return;
     }
 
-    const reciprocalImmediateRelative = {
-      _id: this.state.currentPerson.id,
-      relationship: reciprocalRelationship,
-      fullname: `${this.state.currentPerson.firstname} ${this.state.currentPerson.lastname}`
+    // Check for duplications
+    const existingRelative = this.state.currentPerson.immediaterelatives.find(relative => relative._id === immediaterelative.id);
+    if (existingRelative) {
+      this.setState({ error: "This relative already exists." });
+      return;
+    }
+
+    // Prepare data for the server
+    const data = {
+      personId: this.state.currentPerson.id,
+      immediaterelativeId: immediaterelative.id,
+      fullname: `${immediaterelative.firstname} ${immediaterelative.lastname}`,
+      relationship,
+      reciprocalFullname: `${this.state.currentPerson.firstname} ${this.state.currentPerson.lastname}`
     };
 
-    // Call method to update the immediate relatives of a person
-    PersonDataService.updateImmediateRelatives(immediaterelative.id, reciprocalImmediateRelative)
+    // Call the server to add the immediate relative
+    PersonDataService.addImmediateRelative(data)
       .then(response => {
-        console.log("Reciprocal relationship added:", response.data);
+        this.setState(
+          (prevState) => ({
+            currentPerson: {
+              ...prevState.currentPerson,
+              immediaterelatives: [...prevState.currentPerson.immediaterelatives, { _id: immediaterelative.id, relationship, fullname: `${immediaterelative.firstname} ${immediaterelative.lastname}` }],
+            },
+            showAddImmediateRelative: false, // Hide AddImmediateRelative after adding
+            message: response.data.message.includes("successfully") ? response.data.message : "", // Set the success message from the server 
+            error: response.data.message.includes("successfully") ? "" : response.data.message,// Set the error message from the server
+          })/*,
+          () => {
+            this.updateContent();
+          }*/
+        );
       })
       .catch(e => {
-        console.log(e);
+        this.setState({ error: e.response.data.message });
       });
   }
 
@@ -266,21 +219,23 @@ class Person extends Component {
    * @returns {void}
    */
   onDeleteImmediateRelative(immediaterelativeId) {
-    const updatedImmediateRelatives = this.state.currentPerson.immediaterelatives.filter(immediaterelative => immediaterelative._id !== immediaterelativeId);
-    const deletedRelative = this.state.currentPerson.immediaterelatives.find(immediaterelative => immediaterelative._id === immediaterelativeId);
+    if (window.confirm("Are you sure you want to delete this immediate relative?")) {
+      const updatedImmediateRelatives = this.state.currentPerson.immediaterelatives.filter(immediaterelative => immediaterelative._id !== immediaterelativeId);
+      const deletedRelative = this.state.currentPerson.immediaterelatives.find(immediaterelative => immediaterelative._id === immediaterelativeId);
 
-    this.setState(
-      (prevState) => ({
-        currentPerson: {
-          ...prevState.currentPerson,
-          immediaterelatives: updatedImmediateRelatives,
+      this.setState(
+        (prevState) => ({
+          currentPerson: {
+            ...prevState.currentPerson,
+            immediaterelatives: updatedImmediateRelatives,
+          }
+        }),
+        () => {
+          this.updateContent();
+          this.deleteReciprocalRelationship(deletedRelative);
         }
-      }),
-      () => {
-        this.updateContent();
-        this.deleteReciprocalRelationship(deletedRelative);
-      }
-    );
+      );
+    }
   }
 
   /**
