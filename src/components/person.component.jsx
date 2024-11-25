@@ -104,8 +104,8 @@ class Person extends Component {
   updateStatus(status) {
     let data = {
       id: this.state.currentPerson.id,
-      firstname: this.state.currentPerson.firstname,
-      lastname: this.state.currentPerson.lastname,
+      firstname: this.state.currentPerson.firstname.trim(),
+      lastname: this.state.currentPerson.lastname.trim(),
       gender: this.state.currentPerson.gender,
       deceased: status,
       immediaterelatives: this.state.currentPerson.immediaterelatives,

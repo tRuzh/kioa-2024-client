@@ -44,8 +44,8 @@ class AddPerson extends Component {
 
   savePerson() {
     const data = {
-      firstname: this.state.firstname,
-      lastname: this.state.lastname,
+      firstname: this.state.firstname.trim(),
+      lastname: this.state.lastname.trim(),
       gender: this.state.gender,
     };
 
