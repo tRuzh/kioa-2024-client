@@ -133,12 +133,16 @@ class Person extends Component {
     this.props
       .updatePerson(currentPerson.id, currentPerson)
       .then((response) => {
-        this.setState({ message: "The person was updated successfully!" });
-        //this.updateImmediateRelatives(currentPerson);
+        this.setState({ 
+          message: "The person was updated successfully!",
+          error: null,
+        });
       })
       .catch((e) => {
+        this.setState({
+          error: e.response.data.message,
+        });
         console.log(e);
-        this.setState({ error: e.message });
       });
   }
 

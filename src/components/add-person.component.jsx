@@ -1,6 +1,7 @@
-// add-person.component.jsx
+// client-git/src/components/add-person.component.jsx
 import React, { Component } from "react";
 import { connect } from "react-redux";
+import PersonDataService from "../services/person.service";
 import { createPerson } from "../actions/people";
 
 class AddPerson extends Component {
@@ -42,30 +43,27 @@ class AddPerson extends Component {
   }
 
   savePerson() {
-    const { firstname, lastname, gender } = this.state;
+    const data = {
+      firstname: this.state.firstname,
+      lastname: this.state.lastname,
+      gender: this.state.gender,
+    };
 
-    if (!firstname || !lastname || !gender) {
-      this.setState({ error: "Firstname, Lastname, and Gender are required!" });
-      return;
-    }
-
-    this.props
-      .createPerson(firstname, lastname, gender)
-      .then((data) => {
+    PersonDataService.create(data)
+      .then((response) => {
         this.setState({
-          id: data.id,
-          firstname: data.firstname,
-          lastname: data.lastname,
-          gender: data.gender,
-          deceased: data.deceased,
+          id: response.data.id,
+          firstname: response.data.firstname,
+          lastname: response.data.lastname,
+          gender: response.data.gender,
           submitted: true,
           error: null,
         });
-        console.log(data);
       })
       .catch((e) => {
-        this.setState({ error: e.message });
-        console.log(e);
+        this.setState({
+          error: e.response.data.message,
+        });
       });
   }
 
@@ -93,11 +91,6 @@ class AddPerson extends Component {
           </div>
         ) : (
           <div>
-            {this.state.error && (
-              <div className="alert alert-danger" role="alert">
-                {this.state.error}
-              </div>
-            )}
             <div className="form-group">
               <label htmlFor="firstname">Firstname</label>
               <input
@@ -139,6 +132,11 @@ class AddPerson extends Component {
             <button onClick={this.savePerson} className="btn btn-success">
               Submit
             </button>
+            {this.state.error && (
+              <div className="alert alert-danger" role="alert">
+                {this.state.error}
+              </div>
+            )}
           </div>
         )}
       </div>
